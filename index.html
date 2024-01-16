@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generative Art Canvas</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="artCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('artCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas, false);
+        resizeCanvas();
+
+        function clearCanvas() {
+            // ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.01)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        let a_offset = 0;
+        function draw() {
+            for(let a = 0; a < 360; a += 10) {
+                ctx.fillStyle = `hsl(${a + a_offset}, 100%, 50%)`;
+                let x = Math.cos(a * Math.PI / 180) * 100 + canvas.width / 2;
+                let y = Math.sin(a * Math.PI / 180) * 100 + canvas.height / 2;
+                ctx.fillRect(x, y, 10, 10);
+            }
+        }
+
+        function loop() {
+            requestAnimationFrame(loop);
+            clearCanvas();
+            draw();
+
+            a_offset += 1;
+        }
+
+        loop();
+    </script>
+</body>
+</html>
