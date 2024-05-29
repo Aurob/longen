@@ -17,6 +17,7 @@
             display: block;
         }
     </style>
+    <script src="https://data.rau.dev/code/noise.js"></script>
 </head>
 
 <body>
@@ -46,7 +47,8 @@
                 ctx.fillStyle = 'red';
                 ctx.fill();
 
-                point.y += 1;
+                point.x += noise.perlin3(point.x, point.y, Date.now() / 100) * 2;
+                point.y += noise.perlin3(point.x, point.y, Date.now() / 100) * 2;
                 if (point.y > canvas.height) {
                     point.y = 0;
                 }
