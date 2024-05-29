@@ -33,23 +33,25 @@
         }
 
         window.addEventListener('resize', resizeCanvas, false);
-        function clearCanvas() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
 
         function loop() {
-            requestAnimationFrame(loop);
-            clearCanvas();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            points1.forEach((point) => {
+            for(let i = 0; i < points1.length; i++) {
+                let point = points1[i];
                 let x = point.x;
                 let y = point.y;
                 ctx.beginPath();
                 ctx.arc(x, y, 2, 0, Math.PI * 2);
                 ctx.fillStyle = 'red';
                 ctx.fill();
-            });
+
+                point.y += 1;
+                if (point.y > canvas.height) {
+                    point.y = 0;
+                }
+            }
+            requestAnimationFrame(loop);
         }
 
         window.addEventListener('load', () => {
