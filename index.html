@@ -26,99 +26,34 @@
         const ctx = canvas.getContext('2d');
         let points1 = [];
         let a_offset = 0;
-        // Rendering mode tests
-        let modes = ['source-over', 'source-in', 'source-out', 'source-atop', 'destination-over', 'destination-in', 'destination-out', 'destination-atop', 'lighter', 'copy', 'xor'];
-        let modeIndex = 0;
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
 
-        function changeMode() {
-            ctx.globalCompositeOperation = modes[modeIndex];
-            modeIndex = (modeIndex + 1) % modes.length;
-        }
         window.addEventListener('resize', resizeCanvas, false);
         function clearCanvas() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.01)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-
-        function drawPolygon(points, fillColor) {
-            if (points.length < 3) return; // A polygon must have at least 3 points
-            ctx.fillStyle = fillColor;
-            ctx.beginPath();
-            ctx.moveTo(points[0].x, points[0].y);
-            for (let i = 1; i < points.length; i++) {
-                ctx.lineTo(points[i].x, points[i].y);
-            }
-            ctx.closePath();
-            ctx.fill();
-        }
-
-        function draw() {
-            let temp_points = JSON.parse(JSON.stringify(points1));
-            let fillColor = `rgba(50, 105, 200, 0.5)`;
-            drawPolygon(temp_points, fillColor);
-        }
-
-        let currentPoint = 0;
-        function checkClickPoint() {
-
-            let nearest = -1;
-            let minDist = 1000000;
-            for (let i = 0; i < points1.length; i++) {
-                let dist = Math.sqrt(Math.pow(mouse.x - points1[i].x, 2) + Math.pow(mouse.y - points1[i].y, 2));
-                if (dist < minDist) {
-                    minDist = dist;
-                    nearest = i;
-                }
-            }
-            if (nearest != -1) {
-                points1[nearest].x = mouse.x;
-                points1[nearest].y = mouse.y;
-                currentPoint = nearest;
-                points1[nearest].timer = 100;
-            }
         }
 
         function loop() {
             requestAnimationFrame(loop);
             clearCanvas();
 
-            // find the nearest point where the mouse is if the left click is pressed
-            // if (mouse.lclick) {
-            checkClickPoint();
-            // }
-
-            draw();
-
-            // reset points to the default pos if timer is up
-            for (let i = 0; i < points1.length; i++) {
-                if (points1[i].timer > 0) {
-                    points1[i].timer--;
-                } else {
-                    points1[i].x = points1[i].default.x;
-                    points1[i].y = points1[i].default.y;
-                }
-            }
+            points1.forEach((point) => {
+                let x = point.x;
+                let y = point.y;
+                ctx.beginPath();
+                ctx.arc(x, y, 2, 0, Math.PI * 2);
+                ctx.fillStyle = 'red';
+                ctx.fill();
+            });
         }
 
-        var mouse = { x: 0, y: 0 , lclick: false, rclick: false };
         window.addEventListener('load', () => {
             resizeCanvas();
-
-            // center circle
-            // let center = { x: canvas.width / 2, y: canvas.height / 2 };
-            // let radius = 200;
-            // let points = 360/10;
-            // for (let i = 0; i < points; i++) {
-            //     let angle = (i / points) * Math.PI * 2;
-            //     let x = center.x + Math.cos(angle) * radius;
-            //     let y = center.y + Math.sin(angle) * radius;
-            //     points1.push({ x: x, y: y });
-            // }
 
             // grid
             let rows = 100;
@@ -129,32 +64,11 @@
                 for (let j = 0; j < cols; j++) {
                     let x = j * w + w / 2;
                     let y = i * h + h / 2;
-                    points1.push({ x: x, y: y, default: { x: x, y: y }, timer: 0 });
+                    points1.push({ x: x, y: y });
                 }
             }
 
             loop();
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-        });
-
-        window.addEventListener('mousedown', (e) => {
-            if (e.button == 0) {
-                mouse.lclick = true;
-            } else if (e.button == 2) {
-                mouse.rclick = true;
-            }
-        });
-
-        window.addEventListener('mouseup', (e) => {
-            if (e.button == 0) {
-                mouse.lclick = false;
-            } else if (e.button == 2) {
-                mouse.rclick = false;
-            }
         });
 
     </script>

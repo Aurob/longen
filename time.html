@@ -1,0 +1,100 @@
+<html>
+<head>
+
+</head>
+<body>
+    <div id="page"> </div>
+    <div id="nav">
+        <button id="nav-left">Left</button>
+        <div id="nav-info">
+            <h2 id="nav-title">Title</h2>
+            <p id="nav-description">Description</p>
+            <time id="nav-date">YYYY-MM-DD</time>
+        </div>
+        <button id="nav-right">Right</button>
+    </div>
+    <script>
+        const owner = 'aurob';
+        const repo = 'longen';
+        const path = 'index.html';
+        const page = document.getElementById('page');
+
+        function getCommit(sha) {
+            return fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${sha}`)
+                .then(response => response.json())
+                .then(fileData => {
+                    const content = atob(fileData.content); // Decode Base64 content
+                    // load into iframe
+                    let iframe = document.createElement('iframe');
+                    iframe.src = 'data:text/html;charset=utf-8,' + encodeURI(content);
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    page.innerHTML = '';
+                    page.appendChild(iframe);
+
+                    
+                })
+                .catch(error => console.error('Error fetching file content:', error));
+        }
+        function loadPage(commits) {
+            
+            
+            console.log('Commits:', commits);
+            // console.log(commits); // Process commits as needed
+            document.getElementById('nav-title').textContent = 'Generative Art Canvas';
+            document.getElementById('nav-description').textContent = 'A canvas for generative art';
+            document.getElementById('nav-date').textContent = '2020-07-01';
+
+            let commit_index = commits.length - 1;
+            const navLeftButton = document.getElementById('nav-left');
+            const navRightButton = document.getElementById('nav-right');
+
+            function updateButtonStyles() {
+                navLeftButton.style.opacity = commit_index > 0 ? '1' : '0.5';
+                navRightButton.style.opacity = commit_index < commits.length - 1 ? '1' : '0.5';
+            }
+
+            // Add event listeners to navigation buttons
+            navLeftButton.addEventListener('click', () => {
+                console.log('Left button clicked');
+
+                if (commit_index > 0) {
+                    commit_index--;
+                    console.log('Commit index:', commit_index);
+                    getCommit(commits[commit_index].sha);
+                    updateButtonStyles();
+                }
+            });
+
+            navRightButton.addEventListener('click', () => {
+                console.log('Right button clicked');
+                
+                if (commit_index < commits.length - 1) {
+                    commit_index++;
+                    console.log('Commit index:', commit_index);
+                    getCommit(commits[commit_index].sha);
+                    updateButtonStyles();
+                }
+            });
+
+            updateButtonStyles(); // Initial button style update
+            getCommit(commits[commit_index].sha);
+        }
+
+        // Define async function to fetch commits of a specific file from a GitHub repo
+        async function fetchFileCommits(owner, repo, path) {
+            return fetch(`https://api.github.com/repos/${owner}/${repo}/commits?path=${path}`)
+                .then(response => response.json())
+                .then(commits => {
+                    loadPage(commits);
+                })
+                .catch(error => console.error('Error fetching commits:', error));
+        }
+
+
+        // Example usage
+        fetchFileCommits(owner, repo, path);
+    </script>
+</body>
+
+</html>
